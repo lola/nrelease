@@ -52,7 +52,7 @@ PKGBIN_PKG_ADMIN?=	${PKGSRC_PREFIX}/sbin/pkg_admin
 PKGBIN_MKISOFS?=	${PKGSRC_PREFIX}/bin/mkisofs
 PKGSRC_PKG_PATH?=	${ISODIR}/packages
 PKGSRC_DB?=		/var/db/pkg
-PKGSRC_BOOTSTRAP_URL?=	http://pkgbox.dragonflybsd.org/DragonFly-pkgsrc-packages/i386/1.12.0-RELEASE-BUILD
+PKGSRC_BOOTSTRAP_URL?=	http://pkgbox.dragonflybsd.org/packages/DragonFly-2.0/stable/All
 
 ENVCMD?=	env
 TAR?=	tar
@@ -86,7 +86,31 @@ PKGSRC_PACKAGES+=	modular-xorg-apps \
 			modular-xorg-drivers \
 			modular-xorg-fonts \
 			modular-xorg-libs \
-			fluxbox
+			fluxbox \
+			firefox3 \
+			xpdf \
+			zsh \
+			emacs \
+			vim \
+			pidgin \
+			irssi \
+			xchat \
+			rxvt-unicode \
+			eterm \
+			perl \
+			nano \
+			bash \
+			exctags \
+			zip \
+			sudo \
+			links-gui \
+			nmap \
+			wget \
+			terminus-font \
+			rsync \
+			idesk \
+			screen
+
 ROOTSKELS+=		${.CURDIR}/gui
 .endif
 
