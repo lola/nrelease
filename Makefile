@@ -57,8 +57,7 @@ PKGSRC_BOOTSTRAP_URL?=	http://pkgbox.dragonflybsd.org/packages/DragonFly-2.0/sta
 ENVCMD?=	env
 TAR?=	tar
 
-PKGSRC_CDRECORD?=	cdrtools-ossdvd-2.01.1.36nb2.tgz
-PKGSRC_BOOTSTRAP_KIT?=	bootstrap-kit-20080211
+PKGSRC_BOOTSTRAP_KIT?=	bootstrap-kit-20080812
 CVSUP_BOOTSTRAP_KIT?=	cvsup-bootstrap-20070716
 
 # Default packages to be installed on the release ISO.
@@ -79,6 +78,14 @@ OLD_PKGSRC_PACKAGES?= cdrtools-2.01.01.27nb1 cdrecord-2.00.3nb2 \
 #
 REQ_ROOTSKELS= ${.CURDIR}/root
 ROOTSKELS?=	${REQ_ROOTSKELS}
+
+.if defined(WITH_INSTALLER)
+OLD_PKGSRC_PACKAGES+=	dfuibe_installer-1.1.6 gettext-lib-0.14.5 \
+			dfuibe_installer-1.1.7nb1 dfuife_curses-1.5 \
+			gettext-lib-0.14.6 gettext-tools-0.14.6nb1 \
+			libaura-3.1 libdfui-4.2 libinstaller-5.1
+ROOTSKELS+=		${.CURDIR}/installer
+.endif
 
 .if defined(WITH_GUI)
 ISOFILE?=		${ISODIR}/dfly-gui.iso
@@ -112,14 +119,6 @@ PKGSRC_PACKAGES+=	modular-xorg-apps \
 			screen
 
 ROOTSKELS+=		${.CURDIR}/gui
-.endif
-
-.if defined(WITH_INSTALLER)
-OLD_PKGSRC_PACKAGES+=	dfuibe_installer-1.1.6 gettext-lib-0.14.5 \
-			dfuibe_installer-1.1.7nb1 dfuife_curses-1.5 \
-			gettext-lib-0.14.6 gettext-tools-0.14.6nb1 \
-			libaura-3.1 libdfui-4.2 libinstaller-5.1
-ROOTSKELS+=		${.CURDIR}/installer
 .endif
 
 ISOFILE ?= ${ISODIR}/dfly.iso
