@@ -190,6 +190,13 @@ buildworld1 buildworld2:
 	cd ${.CURDIR}/..; CCVER=${WORLD_CCVER} make ${WITH_INSTALLER:C/^/-DWANT_INSTALLER/} ${.TARGET:C/build(.*)2/quick\1/:C/1//}
 
 buildkernel1 buildkernel2:
+.if make(gui)
+	cd ${.CURDIR}/..; \
+	for kernconf in ${KERNCONF}; do \
+		CCVER=${KERNEL_CCVER} make ${.TARGET:C/build(.*)2/quick\1/:C/1//} \
+		KERNCONF=$${kernconf} KERNCONFDIR=${.CURDIR}/gui/root; \
+	done
+.else
 	cd ${.CURDIR}/..; \
 	first=; \
 	for kernconf in ${KERNCONF}; do \
@@ -198,6 +205,7 @@ buildkernel1 buildkernel2:
 			$${first:+-DNO_MODULES}; \
 		first=done; \
 	done
+.endif
 
 # note that we do not want to mess with any /usr/obj directories not related
 # to buildworld, buildkernel, or nrelease, so we must supply the proper
@@ -207,10 +215,27 @@ buildkernel1 buildkernel2:
 buildiso:
 	if [ ! -d ${ISOROOT} ]; then mkdir -p ${ISOROOT}; fi
 	if [ ! -d ${NRLOBJDIR}/nrelease ]; then mkdir -p ${NRLOBJDIR}/nrelease; fi
-	( cd ${.CURDIR}/..; make ${WITH_INSTALLER:C/^/-DWANT_INSTALLER/} DESTDIR=${ISOROOT} installworld )
+	( cd ${.CURDIR}/..; make ${WITH_INSTALLER:C/^/-DWANT_INSTALLER/} \
+		 DESTDIR=${ISOROOT} installworld )
 	( cd ${.CURDIR}/../etc; MAKEOBJDIRPREFIX=${NRLOBJDIR}/nrelease \
 		make -m ${.CURDIR}/../share/mk DESTDIR=${ISOROOT} distribution )
 	cpdup ${ISOROOT}/etc ${ISOROOT}/etc.hdd
+.if make(gui)
+	if [ ! -d ${ISOROOT}/kernel.smp ]; then mkdir -p ${ISOROOT}/kernel.smp; fi
+	cd ${.CURDIR}/..; \
+	make installkernel DESTDIR=${ISOROOT} \
+		KERNCONF=DFLYLIVE DESTKERNNAME=kernel KERNCONFDIR=${.CURDIR}/gui/root; \
+	cd ${.CURDIR}/..; \
+	make installkernel DESTDIR=${ISOROOT} \
+		KERNCONF=VKERNEL DESTKERNNAME=kernel.VKERNEL -DNO_MODULES KERNCONFDIR=${.CURDIR}/gui/root; \
+	cd ${.CURDIR}/..; \
+	make installkernel DESTDIR=${ISOROOT}/kernel.smp \
+		KERNCONF=DFLYLIVE-SMP DESTKERNNAME=kernel KERNCONFDIR=${.CURDIR}/gui/root; \
+	cd ${.CURDIR}/..; \
+	make installkernel DESTDIR=${ISOROOT}/kernel.smp \
+		KERNCONF=DFLYLIVE-SMP-NOAPIC DESTKERNNAME=kernel.noapic \
+		KERNCONFDIR=${.CURDIR}/gui/root -DNO_MODULES;
+.else
 	cd ${.CURDIR}/..; \
 	first=; \
 	for kernconf in ${KERNCONF}; do \
@@ -220,6 +245,7 @@ buildiso:
 			$${first:+-DNO_MODULES}; \
 		first=done; \
 	done
+.endif
 	ln -s kernel ${ISOROOT}/kernel.BOOTP
 	mtree -deU -f ${.CURDIR}/../etc/mtree/BSD.local.dist -p ${ISOROOT}/usr/local/
 	mtree -deU -f ${.CURDIR}/../etc/mtree/BSD.var.dist -p ${ISOROOT}/var
